@@ -1,6 +1,9 @@
 package com.stackroute.keepnote.repository;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.stackroute.keepnote.model.Note;
 
@@ -13,46 +16,64 @@ import com.stackroute.keepnote.model.Note;
 public class NoteRepository {
 
 	/* Declare a variable called "list" to store all the notes. */
+	List<Note> list;
 
 	public NoteRepository() {
 
 		/* Initialize the variable using proper data type */
+		list=new ArrayList<Note>();
 	}
 
 	/* This method should return all the notes in the list */
 
 	public List<Note> getList() {
-		return null;
+		return list;
 	}
 
 	/* This method should set the list variable with new list of notes */
 
 	public void setList(List<Note> list) {
-
+        this.list=list;
 	}
+	
 
+	
 	/*
 	 * This method should Note object as argument and add the new note object into
 	 * list
 	 */
 
-	public void addNote(Note note) {
+	public NoteRepository(List<Note> list) {
+		super();
+		this.list = list;
+	}
 
+	public void addNote(Note note) {
+          this.list.add(note);
 	}
 
 	/* This method should deleted a specified note from the list */
 
 	public boolean deleteNote(int noteId) {
 		/* Use list iterator to find matching note id and remove it from the list */
-		return false;
-		
-		
-	}
-
-	/* This method should return the list of notes */
+		int index=-1;
+		ListIterator<Note> it = list.listIterator();
+        while (it.hasNext()) {
+        	index++;
+            if (it.next().getNoteId()==noteId) {
+            	list.remove(index);
+               return true;
+            }
+        }
+        
+            
+            	return false;
+        
+        }
+    	/* This method should return the list of notes */
 
 	public List<Note> getAllNotes() {
-		return null;
+		return this.list;
 	}
 
 	/*
@@ -62,6 +83,13 @@ public class NoteRepository {
 	 */
 
 	public boolean exists(int noteId) {
+		ListIterator<Note> it = list.listIterator();
+		while(it.hasNext()) {
+		if (it.next().getNoteId()==noteId) {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 }

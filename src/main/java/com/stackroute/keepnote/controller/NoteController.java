@@ -1,10 +1,26 @@
 package com.stackroute.keepnote.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
+import com.stackroute.keepnote.model.Note;
+import com.stackroute.keepnote.repository.NoteRepository;
 
 /*Annotate the class with @Controller annotation. @Controller annotation is used to mark 
  * any POJO class as a controller so that Spring can recognize this class as a Controller
  * */
-
+@Controller
 public class NoteController {
 	/*
 	 * From the problem statement, we can understand that the application
@@ -16,13 +32,21 @@ public class NoteController {
 	 * 3. Delete an existing note.
 	 * 4. Update an existing note.
 	 */
-	
+	ApplicationContext ct=new ClassPathXmlApplicationContext("beans.xml");
 	/* 
 	 * Get the application context from resources/beans.xml file using ClassPathXmlApplicationContext() class.
 	 * Retrieve the Note object from the context.
 	 * Retrieve the NoteRepository object from the context.
 	 */
+	Note nt=ct.getBean(Note.class);
+	NoteRepository nr= ct.getBean(NoteRepository.class);
 	
+	@GetMapping(path= {"/"})
+	public String showCust(ModelMap map) {
+		List<Note> notelist=nr.getAllNotes();
+		map.addAttribute("nlist", notelist);
+		return "index";
+		}
 	
 	/*Define a handler method to read the existing notes by calling the getAllNotes() method 
 	 * of the NoteRepository class and add it to the ModelMap which is an implementation of Map 
@@ -37,6 +61,26 @@ public class NoteController {
 	 * should be sent back to the view using ModelMap.
 	 * This handler method should map to the URL "/saveNote". 
 	*/
+	@RequestMapping(path= "/saveNote",
+			method= RequestMethod.POST)
+	public String adNote(@RequestParam("noteId") Integer noteId, @RequestParam("noteTitle") String noteTitle,
+			@RequestParam("noteContent") String noteContent,
+			@RequestParam("noteStatus") String noteStatus)
+			 {
+		Note n=ct.getBean(Note.class);
+		n.setNoteId(noteId);
+		n.setNoteTitle(noteTitle);
+		n.setNoteContent(noteContent);
+		n.setNoteStatus(noteStatus);
+		//n.setCreatedAt(createdAt);
+		nr.addNote(n);
+		return "index";
+	}
+	@RequestMapping(path="/deleteNote")    
+    public String deleteCust(@RequestParam("noteId") Integer noteId){    
+        nr.deleteNote(noteId);   
+        return "redirect:/";    
+    }
 	
 	
 	/* Define a handler method to delete an existing note by calling the deleteNote() method 
